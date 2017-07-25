@@ -1,5 +1,11 @@
 <?php
+require_once"lib\parse_headers.php";
+//require_once"lib\encode.php";
+//echo phpinfo();
 
+
+
+<<<<<<< HEAD
 
 function http_parse_headers( $header )
     {
@@ -31,6 +37,13 @@ $data_url = parse_url($_GET['url']);
 echo"<pre>" ;
 var_dump($data_url);
 echo "</pre>";
+=======
+
+$data_url = parse_url($_GET['url']);
+
+if (count($data_url) < 2)
+	die("Wrong url in request query");
+>>>>>>> 77cd810744dd9f721871dbd9ce01e70c743727df
 
 
 
@@ -42,9 +55,7 @@ if($data_url['query'])
 else
 	$data_url['query']='';
 
-echo"<pre>" ;
-//var_dump($data_url);
-echo "</pre>";
+
 
 if($data_url['scheme'] == 'http')
 {
@@ -60,9 +71,7 @@ $protocol .= $data_url['host'];
 //echo"$protocol";
 
 $fp = fsockopen($protocol, $port);
-echo"<pre>" ;
-	//var_dump($_SERVER);
-echo "</pre>";
+
 
 if(!$fp)
 {
@@ -77,12 +86,17 @@ $out .= "Host: $data_url[host]" . PHP_EOL;
 $out .= "User agent: $_SERVER[HTTP_USER_AGENT]" . PHP_EOL;
 $out .= "Connection: close" . PHP_EOL . PHP_EOL;
 //$out .= PHP_EOL;
-echo "$out";
+
+//echo "$out";
 //echo"<hr>";
 	//$out .= 
 //$out ="";	
 fwrite($fp, $out);
+<<<<<<< HEAD
 $body = "";
+=======
+$body='';	
+>>>>>>> 77cd810744dd9f721871dbd9ce01e70c743727df
 while (!feof($fp))
 {
 	$body .= fgets($fp, 128);
@@ -93,6 +107,7 @@ while (!feof($fp))
 fclose($fp);
 list($header, $body) = explode(PHP_EOL . PHP_EOL, $body);
 
+<<<<<<< HEAD
 $header = http_parse_headers($header);
 
 list($content_type, $content_charset) = explode(";", $header['Content-Type']);
@@ -144,5 +159,50 @@ elseif ($content_type == "text\css")
 {
 	ECHO "CSS";
 }
+=======
+>>>>>>> 77cd810744dd9f721871dbd9ce01e70c743727df
 
-//var_dump($out);
+$header = http_parse_headers($header);
+
+list($content_type, $content_charset) = explode(";", $header['Content-Type']);
+if($content_type == 'text/html')
+{
+	//echo "$body";
+
+
+	libxml_use_internal_errors(true);
+	$html = new DOMDocument();
+	$html->loadHTML($body);
+	$html_resource = array(
+		"img" => "src",
+		"input" => "src",
+		"script" => "scr",
+		"link" => "href",
+		"a" => "href",
+		"form" => "action"
+	);
+
+
+	foreach ($html_resource as $tag => $attr)
+	{
+		foreach($html->getElementsByTagName($tag) as $element)
+		{
+			if($element->hasAttribute($attr))
+			{
+				//var_dump($element->getAttribute($attr));
+				//echo " - ";
+				$element->setAttribute($attr,  encode_resource($element->getAttribute($attr)));
+				//echo "<br>";
+			}
+		}
+	}
+	$body = $html->saveHTML();
+	$body = str_replace("parent&&parent!=window&&(document.getElementsByTagName('body')[0].innerHTML='');", "", $body);
+	$body = str_replace("location.replace(location.toString())", "", $body);
+	
+	echo "$body";
+};
+
+;
+	
+//if()
