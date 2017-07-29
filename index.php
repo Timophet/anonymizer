@@ -1,11 +1,11 @@
 <?php
-require_once"lib\parse_headers.php";
+require_once"lib/parse_headers.php";
 //require_once"lib\encode.php";
 //echo phpinfo();
 
 
 
-<<<<<<< HEAD
+
 
 function http_parse_headers( $header )
     {
@@ -24,26 +24,14 @@ function http_parse_headers( $header )
         return $retVal;
     }   
 
-//echo phpinfo();
-echo"<pre>";
-echo"<pre>" ;
-//var_dump($_GET);
-echo "</pre>";
 
 $data_url = parse_url($_GET['url']);
 
-//	$data_url = parse_url("https://github.com/Timophet/anonymizer");
 
-echo"<pre>" ;
-var_dump($data_url);
-echo "</pre>";
-=======
 
-$data_url = parse_url($_GET['url']);
 
 if (count($data_url) < 2)
 	die("Wrong url in request query");
->>>>>>> 77cd810744dd9f721871dbd9ce01e70c743727df
 
 
 
@@ -68,7 +56,6 @@ else
 	$port = 443;
 }
 $protocol .= $data_url['host'];
-//echo"$protocol";
 
 $fp = fsockopen($protocol, $port);
 
@@ -92,79 +79,30 @@ $out .= "Connection: close" . PHP_EOL . PHP_EOL;
 	//$out .= 
 //$out ="";	
 fwrite($fp, $out);
-<<<<<<< HEAD
 $body = "";
-=======
-$body='';	
->>>>>>> 77cd810744dd9f721871dbd9ce01e70c743727df
 while (!feof($fp))
 {
 	$body .= fgets($fp, 128);
 }	
 
-//var_dump($body);
 
 fclose($fp);
+
+//var_dump($body);
+
 list($header, $body) = explode(PHP_EOL . PHP_EOL, $body);
 
-<<<<<<< HEAD
+
 $header = http_parse_headers($header);
-
-list($content_type, $content_charset) = explode(";", $header['Content-Type']);
-
-
 
 //var_dump($header);
-echo"<hr>";
-echo "$content_type, $content_charset";
-
-if("$content_type" == "text/html")
-{
-	//echo"HTML";
-	libxml_use_internal_errors(true);
-
-	$html = new DOMDocument();
-	$html->loadHTML($body);
-
-	$html_resource = array(	'img' => 'src',
-						 	'input' => 'src',
-						 	'script' => 'src',
-						 	'link' => 'href',
-						 	'a' => 'href',
-						 	'form' => 'action');
-	foreach ($html_resource as $tag => $attr) 
-	{
-		foreach ($html->getElementsByTagName($tag) as $element) 
-		{
-			if($element->hasAttribute ($attr))
-			{	
-				$element->setAttribute ($attr, "php");
-			//	var_dump($element->getAttribute ($attr));
-			};
-			//echo "<br>";
-		}
-	}
-
-	$body = $html->saveHTML();
- 	//var_dump($html);
-
-	$body = str_replace("parent&&parent!=window&&(document.getElementsByTagName('body')[0].innerHTML='');", '', $body);
-	
-	$body = str_replace(",location.replace(location.toString())", '', $body);
-	
-
-	echo "$body";
-}
-elseif ($content_type == "text\css") 
-{
-	ECHO "CSS";
-}
-=======
->>>>>>> 77cd810744dd9f721871dbd9ce01e70c743727df
-
-$header = http_parse_headers($header);
 
 list($content_type, $content_charset) = explode(";", $header['Content-Type']);
+
+//preg_match_all('#url\s*{\s*(([^)]*(\\\))*[^)]*)(\)|$)?#i', $body, $matches, PREG_SET_ORDER);
+//'Content-Type:' & $content_type & "; charset=" & $content_charse
+
+header("Content-Type: $content_type");
 if($content_type == 'text/html')
 {
 	//echo "$body";
@@ -198,10 +136,34 @@ if($content_type == 'text/html')
 	}
 	$body = $html->saveHTML();
 	$body = str_replace("parent&&parent!=window&&(document.getElementsByTagName('body')[0].innerHTML='');", "", $body);
-	$body = str_replace("location.replace(location.toString())", "", $body);
+	$body = str_replace(",location.replace(location.toString())", "", $body);
+	//echo "$body";	
 	
-	echo "$body";
-};
+}
+
+elseif ($content_type == 'text/css')
+{
+	//echo "$body";	
+	
+	$full_path = $_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['SCRIPT_NAME'] . "?url=" . $data_url['scheme'] . "://" . $data_url['host'];
+	
+	//echo "$full_path";
+	$body = str_replace("url(",  "url(". $full_path, $body);
+
+	//echo "CSS";	
+	
+	//preg_match_all('#url\s*{\s*(([^)]*(\\\))*[^)]*)(\)|$)?#i', $body, $matches, PREG_SET_ORDER);
+	
+	//var_dump($matches);	
+	//for($i = 0, $count = count($matches); $i < $count; ++i)
+	{
+		//$body = str_replace($matches[$i][0], 'url('.fix_css($matches[$i][1]).')', $body);	
+	}
+	//echo "$new";
+
+		
+}
+echo "$body";	
 
 ;
 	

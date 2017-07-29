@@ -50,6 +50,6 @@ function fix_css($url)
 {
 	$url = trim($url);
 	$delim = strpos($url, '"') === 0 ?  '"' : (strpos($url, "'") === 0 ? : '');
-	return $delim.preg_replace('#([\(\),\s\'"\\\])#', '\\$1', encode_resource_url(trim(preg_replace('#\\\(.)#', '$1', trim($url, $delim))))).$delim;
+	return $delim.preg_replace('#([\(\),\s\'"\\\])#', '\\$1', encode_resource(trim(preg_replace('#\\\(.)#', '$1', trim($url, $delim))))).$delim;
 }
 
